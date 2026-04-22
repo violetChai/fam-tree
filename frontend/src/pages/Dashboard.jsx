@@ -3,30 +3,40 @@ import api from "../services/api";
 import FamilyTree from "../components/FamilyTree";
 
 export default function Dashboard() {
-    const [people, setPeople] = useState([]);
+
+    const [treeData, setTreeData] = useState(null);
 
     useEffect(() => {
+
         const fetchPeople = async () => {
+
             const res = await api.get("/people");
-            setPeople(res.data);
+
+            const data = {
+                name: "Family",
+                children: res.data.map(p => ({
+                    name: p.name
+                }))
+            };
+
+            setTreeData(data);
+
         };
 
         fetchPeople();
+
     }, []);
 
     return (
-        <div>
-            <h1>Family Tree</h1>
+        <div className="p-8">
 
-            {/* Family Tree component */}
-            <FamilyTree data={people} />
+            <h1 className="text-3xl font-bold mb-6">
+                Family Tree
+            </h1>
 
-            {/* Optional debug list */}
-            {people.map((p) => (
-                <div key={p._id}>
-                    {p.name}
-                </div>
-            ))}
+            {treeData && <FamilyTree data={treeData} />}
+
         </div>
     );
+
 }

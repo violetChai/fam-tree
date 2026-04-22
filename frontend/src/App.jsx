@@ -5,11 +5,18 @@ import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-    </Routes>
+
+    <div>
+      <h1 className="text-3xl font-bold text-blue-600 bg-yellow-200">
+        Tailwind Working
+      </h1>
+
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </div>
   );
 }
 
