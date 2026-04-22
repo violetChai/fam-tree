@@ -12,11 +12,6 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Tailwind test header (optional) */}
-      <h1 className="text-3xl font-bold text-blue-600 bg-yellow-200 p-4">
-        fam-tree
-      </h1>
-
       <Navbar />
 
       <Routes>

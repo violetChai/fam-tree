@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import FamilyTree from "../components/FamilyTree";
+import { buildTree } from "../utils/buildTree";
 
 export default function Dashboard() {
 
   const [treeData, setTreeData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
 
@@ -15,18 +17,18 @@ export default function Dashboard() {
 
         const res = await api.get("/people");
 
-        const data = {
-          name: "Family",
-          children: res.data.map(p => ({
-            name: p.name
-          }))
-        };
+        console.log("RAW API DATA:", res.data);
 
-        setTreeData(data);
+        const tree = buildTree(res.data);
+
+        console.log("TREE DATA:", tree);
+
+        setTreeData(tree);
 
       } catch (err) {
 
-        console.error("Error fetching people:", err);
+        console.error(err);
+        setError("Failed to load family tree");
 
       } finally {
 
@@ -41,11 +43,11 @@ export default function Dashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="p-8 text-gray-500">
-        Loading family tree...
-      </div>
-    );
+    return <div className="p-8">Loading family tree...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-red-500">{error}</div>;
   }
 
   return (

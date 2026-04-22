@@ -1,26 +1,37 @@
 export function buildTree(people) {
 
-    const map = {};
-    let root = null;
+    if (!people || people.length === 0) {
+        return {
+            name: "Family",
+            children: []
+        };
+    }
 
-    people.forEach(person => {
-        map[person._id] = { ...person, children: [] };
+    const map = {};
+    const roots = [];
+
+    // create node map
+    people.forEach(p => {
+        map[p._id] = {
+            name: p.name,
+            children: []
+        };
     });
 
-    people.forEach(person => {
+    // link parents
+    people.forEach(p => {
 
-        if (person.parent) {
-
-            map[person.parent].children.push(map[person._id]);
-
+        if (p.parent && map[p.parent]) {
+            map[p.parent].children.push(map[p._id]);
         } else {
-
-            root = map[person._id];
-
+            roots.push(map[p._id]);
         }
 
     });
 
-    return root;
-
+    // wrap in single root for D3
+    return {
+        name: "Family",
+        children: roots
+    };
 }
