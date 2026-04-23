@@ -1,47 +1,68 @@
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+
     const navigate = useNavigate();
+
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         navigate("/login");
     };
 
     return (
-        <nav className="bg-gray-800 text-white p-4 flex justify-between">
 
-            <h1 className="font-bold">Family Tree</h1>
+        <nav className="flex justify-between items-center p-4 bg-white shadow-md">
 
-            <div className="space-x-4 flex items-center">
+            <Link to={token ? "/tree" : "/"} className="font-bold text-xl">
+                Family Tree
+            </Link>
 
-                <Link to="/">Dashboard</Link>
-                <Link to="/add-person">Add Person</Link>
-                <Link to="/tree">Tree</Link>
+            <div className="flex items-center gap-4">
 
-                {/* AUTH SECTION */}
+                {token && (
+                    <>
+                        <Link to="/add-person">Add Person</Link>
+                    </>
+                )}
+
                 {!token ? (
                     <>
-                        <Link to="/login" className="text-blue-300">
+                        <Link
+                            to="/login"
+                            className="px-3 py-1 border rounded"
+                        >
                             Login
                         </Link>
 
-                        <Link to="/register" className="text-green-300">
+                        <Link
+                            to="/register"
+                            className="px-3 py-1 bg-blue-500 text-white rounded"
+                        >
                             Register
                         </Link>
                     </>
                 ) : (
-                    <button
-                        onClick={logout}
-                        className="text-red-300"
-                    >
-                        Logout
-                    </button>
+                    <>
+                        <span className="text-gray-600">
+                            Hi, {user?.username}
+                        </span>
+
+                        <button
+                            onClick={logout}
+                            className="px-3 py-1 bg-red-500 text-white rounded"
+                        >
+                            Logout
+                        </button>
+                    </>
                 )}
 
             </div>
 
         </nav>
+
     );
 }
