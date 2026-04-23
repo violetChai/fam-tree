@@ -7,13 +7,17 @@ export default function AddPerson() {
     const navigate = useNavigate();
 
     const [name, setName] = useState("");
+    const [birthYear, setBirthYear] = useState("");
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         try {
-            await api.post("/people", { name });
+            await api.post("/people", {
+                name,
+                birthYear,
+            });
             navigate("/");
         } catch (err) {
             console.log(err.response?.data || err.message);

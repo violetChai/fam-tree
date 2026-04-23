@@ -13,7 +13,9 @@ export function buildTree(people) {
     // create node map
     people.forEach(p => {
         map[p._id] = {
+            _id: p._id,
             name: p.name,
+            birthYear: p.birthYear,
             children: []
         };
     });

@@ -1,9 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import { useNavigate } from "react-router-dom";
+
 
 export default function FamilyTree({ data }) {
 
   const svgRef = useRef();
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
 
@@ -45,26 +48,53 @@ export default function FamilyTree({ data }) {
       .attr("stroke", "#ccc");
 
     // nodes
-    g.selectAll("circle")
+    const nodes = g.selectAll(".node")
       .data(root.descendants())
       .enter()
-      .append("circle")
-      .attr("cx", d => d.y)
-      .attr("cy", d => d.x)
-      .attr("r", 20)
+      .append("g")
+      .attr("transform", d => `translate(${d.y},${d.x})`);
+
+    nodes.append("circle")
+      .attr("r", 26)
       .attr("fill", "#16a34a");
 
-    // labels
-    g.selectAll("text")
-      .data(root.descendants())
-      .enter()
-      .append("text")
-      .attr("x", d => d.y)
-      .attr("y", d => d.x - 30)
+    nodes.append("text")
+      .attr("y", 40)
       .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
       .text(d => d.data.name);
+
+    // CLICK HANDLER
+    nodes.on("click", (event, d) => {
+      setSelected(d.data);
+    });
 
   }, [data]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    <div className="flex">
+
+      <svg ref={svgRef}></svg>
+
+      {selected && (
+        <div className="w-64 p-4 border-l">
+
+          <h3 className="text-lg font-bold">
+            {selected.name}
+          </h3>
+
+          <p>Birth year: {selected.birthYear}</p>
+
+          <button
+            className="mt-4 bg-gray-200 px-2 py-1"
+            onClick={() => setSelected(null)}
+          >
+            Close
+          </button>
+
+        </div>
+      )}
+
+    </div>
+  );
 }
