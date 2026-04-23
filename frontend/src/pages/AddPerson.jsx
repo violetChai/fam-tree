@@ -12,9 +12,13 @@ export default function AddPerson() {
 
         e.preventDefault();
 
-        await api.post("/people", { name });
-
-        navigate("/");
+        try {
+            await api.post("/people", { name });
+            navigate("/");
+        } catch (err) {
+            console.log(err.response?.data || err.message);
+            alert("You must be logged in to add a person");
+        }
     };
 
     return (

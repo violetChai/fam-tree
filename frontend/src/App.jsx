@@ -1,12 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-
 import Navbar from "./components/Navbar";
-
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AddPerson from "./pages/AddPerson";
 import TreePage from "./pages/TreePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -18,8 +17,23 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/add-person" element={<AddPerson />} />
-        <Route path="/tree" element={<TreePage />} />
+        <Route
+          path="/add-person"
+          element={
+            <ProtectedRoute>
+              <AddPerson />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tree"
+          element={
+            <ProtectedRoute>
+              <TreePage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
     </div>

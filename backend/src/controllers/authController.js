@@ -23,9 +23,16 @@ const registerUser = async (req, res) => {
         });
 
         res.status(201).json({
-            id: user._id,
-            username: user.username,
-            email: user.email
+            token: jwt.sign(
+                { id: user._id },
+                process.env.JWT_SECRET,
+                { expiresIn: "7d" }
+            ),
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
         });
 
     } catch (error) {
