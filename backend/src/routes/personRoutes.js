@@ -6,7 +6,7 @@ const protect = require("../middleware/authMiddleware");
 // GET all people (PUBLIC)
 router.get("/", async (req, res) => {
     try {
-        const people = await Person.find();
+        const people = await Person.find().populate("parents children spouse");
         res.json(people);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-        const person = await Person.findById(req.params.id);
+        const person = await Person.findById(req.params.id).populate("parents children spouse");
         res.json(person);
     } catch (err) {
         res.status(500).json({ message: err.message });

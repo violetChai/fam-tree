@@ -12,9 +12,40 @@ export default function TreePage() {
         setTree(buildTree(res.data));
     };
 
+    const [selectedPersonId, setSelectedPersonId] = useState(null);
+    const [person, setPerson] = useState(null);
+
     useEffect(() => {
         loadTree();
     }, []);
+
+    const refreshAll = async () => {
+        const res = await api.get("/people");
+        setTree(buildTree(res.data));
+
+        if (selectedPersonId) {
+            const personRes = await api.get(`/people/${selectedPersonId}`);
+            setPerson(personRes.data);
+        }
+    };
+
+    useEffect(() => {
+
+        if (!selectedPersonId) return;
+
+        const loadPerson = async () => {
+            try {
+                const res = await api.get(`/people/${selectedPersonId}`);
+                setPerson(res.data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        loadPerson();
+
+    }, [selectedPersonId]);
+
 
     return (
         <div className="p-8">
@@ -23,8 +54,48 @@ export default function TreePage() {
             {tree && (
                 <FamilyTree
                     data={tree}
-                    refreshTree={loadTree}
+                    onSelect={setSelectedPersonId}
                 />
+            )}
+
+            {person && (
+                <div className="fixed right-0 top-0 h-full w-72 bg-white border-l p-4 shadow-lg">
+
+                    <h3 className="text-lg font-bold">{person.name}</h3>
+                    <p>Birth year: {person.birthYear}</p>
+
+                    <div className="mt-4">
+                        <h4 className="font-semibold">Parents</h4>
+                        {person.parents?.length === 0 && <p>None</p>}
+                        {person.parents?.map(p => (
+                            <p key={p._id}>{p.name}</p>
+                        ))}
+                    </div>
+
+                    <div className="mt-4">
+                        <h4 className="font-semibold">Children</h4>
+                        {person.children?.length === 0 && <p>None</p>}
+                        {person.children?.map(c => (
+                            <p key={c._id}>{c.name}</p>
+                        ))}
+                    </div>
+
+                    <div className="mt-4">
+                        <h4 className="font-semibold">Spouse</h4>
+                        {person.spouse ? <p>{person.spouse.name}</p> : <p>None</p>}
+                    </div>
+
+                    <button
+                        className="mt-6 bg-gray-200 px-2 py-1"
+                        onClick={() => {
+                            setPerson(null);
+                            setSelectedPersonId(null);
+                        }}
+                    >
+                        Close
+                    </button>
+
+                </div>
             )}
         </div>
     );

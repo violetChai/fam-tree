@@ -1,42 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { useNavigate } from "react-router-dom";
 
-
-export default function FamilyTree({ data }) {
+export default function FamilyTree({ data, onSelect }) {
 
   const svgRef = useRef();
-  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
 
-    if (!data || !data.name) return;
+    if (!data) return;
 
     const width = 900;
     const height = 500;
-    const margin = { top: 80, right: 80, bottom: 80, left: 80 };
 
-    const svg = d3.select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height);
-
-    // clear previous render
+    const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const g = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    svg.attr("width", width).attr("height", height);
 
     const root = d3.hierarchy(data);
 
-    const treeLayout = d3.tree()
-      .size([
-        height - margin.top - margin.bottom,
-        width - margin.left - margin.right
-      ]);
-
+    const treeLayout = d3.tree().size([height - 100, width - 200]);
     treeLayout(root);
 
-    // links
+    const g = svg.append("g").attr("transform", "translate(100,50)");
+
+    // LINKS
     g.selectAll("line")
       .data(root.links())
       .enter()
@@ -47,54 +35,31 @@ export default function FamilyTree({ data }) {
       .attr("y2", d => d.target.x)
       .attr("stroke", "#ccc");
 
-    // nodes
-    const nodes = g.selectAll(".node")
+    // NODES
+    const nodes = g.selectAll("g")
       .data(root.descendants())
       .enter()
       .append("g")
-      .attr("transform", d => `translate(${d.y},${d.x})`);
+      .attr("transform", d => `translate(${d.y},${d.x})`)
+      .style("cursor", "pointer");
 
     nodes.append("circle")
-      .attr("r", 26)
+      .attr("r", 24)
       .attr("fill", "#16a34a");
 
     nodes.append("text")
-      .attr("y", 40)
       .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
+      .attr("y", 40)
       .text(d => d.data.name);
 
-    // CLICK HANDLER
-    nodes.on("click", (event, d) => {
-      setSelected(d.data);
+    // CLICK HANDLER (THIS IS THE CRITICAL PART)
+    nodes.on("click", function (event, d) {
+      if (onSelect) {
+        onSelect(d.data._id);
+      }
     });
 
-  }, [data]);
+  }, [data, onSelect]);
 
-  return (
-    <div className="flex">
-
-      <svg ref={svgRef}></svg>
-
-      {selected && (
-        <div className="w-64 p-4 border-l">
-
-          <h3 className="text-lg font-bold">
-            {selected.name}
-          </h3>
-
-          <p>Birth year: {selected.birthYear}</p>
-
-          <button
-            className="mt-4 bg-gray-200 px-2 py-1"
-            onClick={() => setSelected(null)}
-          >
-            Close
-          </button>
-
-        </div>
-      )}
-
-    </div>
-  );
+  return <svg ref={svgRef}></svg>;
 }

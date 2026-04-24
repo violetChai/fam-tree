@@ -20,18 +20,23 @@ export function buildTree(people) {
         };
     });
 
-    // link parents
+    // build relationships using parents array
     people.forEach(p => {
 
-        if (p.parent && map[p.parent]) {
-            map[p.parent].children.push(map[p._id]);
+        if (p.parents && p.parents.length > 0) {
+
+            p.parents.forEach(parentId => {
+                if (map[parentId]) {
+                    map[parentId].children.push(map[p._id]);
+                }
+            });
+
         } else {
             roots.push(map[p._id]);
         }
 
     });
 
-    // wrap in single root for D3
     return {
         name: "Family",
         children: roots

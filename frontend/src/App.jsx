@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 import AddPerson from "./pages/AddPerson";
 import TreePage from "./pages/TreePage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PersonPage from "./pages/PersonPage";
+import PersonDetail from "./pages/PersonDetail";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/add-person" element={<ProtectedRoute> <AddPerson /> </ProtectedRoute>} />
         <Route path="/tree" element={<ProtectedRoute> <TreePage /> </ProtectedRoute>} />
-        <Route path="/person/:id" element={<PersonPage />} />
+        <Route path="/person/:id" element={<PersonDetail />} />
       </Routes>
 
     </div>

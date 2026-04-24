@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const personRoutes = require("./routes/personRoutes");
 const authRoutes = require("./routes/authRoutes");
+const relationshipRoutes = require("./routes/relationshipRoutes");
 
 require("dotenv").config();
 connectDB();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/api/people", personRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/relationships", relationshipRoutes);
 
 app.get("/", (req, res) => {
     res.send("Family Tree API running");

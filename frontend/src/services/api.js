@@ -14,4 +14,23 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+export const addParent = (parentId, childId) => {
+    return api.post("/relationships/parent", { parentId, childId });
+};
+
+export const addChild = (parentId, childId) => {
+    return api.post("/relationships/child", { parentId, childId });
+};
+
+export const addSpouse = (personId, spouseId) => {
+    return api.post("/relationships/spouse", { personId, spouseId });
+};
+
+export const removeRelationship = (personId, relatedPersonId, type) => {
+    return api.delete("/relationships", {
+        data: { personId, relatedPersonId, type }
+    });
+};
+
+
 export default api;
