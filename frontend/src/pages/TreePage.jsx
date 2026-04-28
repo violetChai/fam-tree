@@ -3,17 +3,21 @@ import api from "../services/api";
 import FamilyTree from "../components/FamilyTree";
 import { buildTree } from "../utils/buildTree";
 
+
+
 export default function TreePage() {
 
     const [tree, setTree] = useState(null);
+    const [people, setPeople] = useState([]);
+    const [selectedPersonId, setSelectedPersonId] = useState(null);
+    const [person, setPerson] = useState(null);
 
     const loadTree = async () => {
         const res = await api.get("/people");
+        setPeople(res.data);
         setTree(buildTree(res.data));
     };
 
-    const [selectedPersonId, setSelectedPersonId] = useState(null);
-    const [person, setPerson] = useState(null);
 
     useEffect(() => {
         loadTree();
@@ -46,6 +50,59 @@ export default function TreePage() {
 
     }, [selectedPersonId]);
 
+    const replaceParent = async (oldParentId, newParentId) => {
+        await api.delete("/relationships", {
+            data: {
+                personId: selectedPersonId,
+                relatedPersonId: oldParentId,
+                type: "parent"
+            }
+        });
+
+        await api.post("/relationships/parent", {
+            parentId: newParentId,
+            childId: selectedPersonId
+        });
+
+        refreshAll();
+    };
+
+    const replaceChild = async (oldChildId, newChildId) => {
+        await api.delete("/relationships", {
+            data: {
+                personId: selectedPersonId,
+                relatedPersonId: oldChildId,
+                type: "child"
+            }
+        });
+
+        await api.post("/relationships/child", {
+            parentId: selectedPersonId,
+            childId: newChildId
+        });
+
+        refreshAll();
+    };
+
+    const replaceSpouse = async (newSpouseId) => {
+        if (person?.spouse) {
+            await api.delete("/relationships", {
+                data: {
+                    personId: selectedPersonId,
+                    relatedPersonId: person.spouse._id,
+                    type: "spouse"
+                }
+            });
+        }
+
+        await api.post("/relationships/spouse", {
+            personId: selectedPersonId,
+            spouseId: newSpouseId
+        });
+
+        refreshAll();
+    };
+
 
     return (
         <div className="p-8">
@@ -65,25 +122,67 @@ export default function TreePage() {
                     <p>Birth year: {person.birthYear}</p>
 
                     <div className="mt-4">
-                        <h4 className="font-semibold">Parents</h4>
-                        {person.parents?.length === 0 && <p>None</p>}
-                        {person.parents?.map(p => (
-                            <p key={p._id}>{p.name}</p>
-                        ))}
+                        <h4 className="font-semibold">Replace Parent</h4>
+
+                        <select
+                            onChange={(e) => {
+                                const newId = e.target.value;
+                                const oldId = person.parents?.[0]?._id;
+                                if (oldId && newId) {
+                                    replaceParent(oldId, newId);
+                                }
+                            }}
+                            className="border w-full"
+                        >
+                            <option value="">Select new parent</option>
+                            {people.map(p => (
+                                <option key={p._id} value={p._id}>
+                                    {p.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="mt-4">
-                        <h4 className="font-semibold">Children</h4>
-                        {person.children?.length === 0 && <p>None</p>}
-                        {person.children?.map(c => (
-                            <p key={c._id}>{c.name}</p>
-                        ))}
+                        <h4 className="font-semibold">Replace Child</h4>
+
+                        <select
+                            onChange={(e) => {
+                                const newId = e.target.value;
+                                const oldId = person.children?.[0]?._id;
+                                if (oldId && newId) {
+                                    replaceChild(oldId, newId);
+                                }
+                            }}
+                            className="border w-full"
+                        >
+                            <option value="">Select new child</option>
+                            {people.map(p => (
+                                <option key={p._id} value={p._id}>
+                                    {p.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="mt-4">
-                        <h4 className="font-semibold">Spouse</h4>
-                        {person.spouse ? <p>{person.spouse.name}</p> : <p>None</p>}
+                        <h4 className="font-semibold">Replace Spouse</h4>
+
+                        <select
+                            onChange={(e) => {
+                                replaceSpouse(e.target.value);
+                            }}
+                            className="border w-full"
+                        >
+                            <option value="">Select spouse</option>
+                            {people.map(p => (
+                                <option key={p._id} value={p._id}>
+                                    {p.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
+
 
                     <button
                         className="mt-6 bg-gray-200 px-2 py-1"
